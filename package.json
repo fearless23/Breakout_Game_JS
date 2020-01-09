@@ -1,0 +1,32 @@
+{
+  "name": "breakout_game_js",
+  "version": "1.0.0",
+  "description": "Javascript Canvas Breakout Game",
+  "main": "index.js",
+  "scripts": {
+    "clean": "rm dist/bundle.js",
+    "start": "parcel src/index.html",
+    "build": "parcel build src/index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fearless23/Breakout_Game_JS.git"
+  },
+  "keywords": [
+    "Canvas",
+    "HTML",
+    "Javascript",
+    "Breakout",
+    "Game"
+  ],
+  "author": "Jaspreet Singh",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fearless23/Breakout_Game_JS/issues"
+  },
+  "homepage": "https://github.com/fearless23/Breakout_Game_JS#readme",
+  "devDependencies": {
+    "parcel-bundler": "^1.12.4",
+    "typescript": "^3.7.4"
+  }
+}
