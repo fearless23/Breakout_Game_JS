@@ -4,9 +4,10 @@
   "description": "Javascript Canvas Breakout Game",
   "main": "index.js",
   "scripts": {
-    "clean": "rm dist/bundle.js",
+    "clean": "rm -r dist",
     "start": "parcel src/index.html",
-    "build": "parcel build src/index.html"
+    "parcel-build": "parcel build src/index.html",
+    "build": "npm run clean && npm run parcel-build"
   },
   "repository": {
     "type": "git",

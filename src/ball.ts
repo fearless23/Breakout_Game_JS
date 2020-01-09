@@ -4,47 +4,69 @@ import { itemIdxInArray } from "./helpers";
 
 const willHitPaddle = (nx: number, paddleXPos: number) => {
   const diff = nx - paddleXPos;
-  if (diff < 0) return false;
-  if (diff > paddleWidth) return false;
+  if (diff < 0 || diff > paddleWidth) return false;
   return true;
 };
 
-const checkBoundary = (
-  [nx, ny]: Position,
+const getPosition = (
+  [cx, cy]: Position,
   [dx, dy]: Position,
   paddleXPos: number
 ) => {
   let isCrash = false;
-  if (nx >= boardSize) {
-    nx = boardSize - 1;
-    dx = -dx;
+  let nx = cx,
+    ny = cy,
+    ndx = dx,
+    ndy = dy;
+  if (cy + dy >= boardSize - 1 && !willHitPaddle(cx + dx, paddleXPos)) {
+    return { isCrash: true };
   }
-  if (ny >= boardSize) {
-    if (willHitPaddle(nx, paddleXPos)) {
-      ny = boardSize - 2;
-      nx = nx - 1;
-      dy = -dy;
-    } else {
-      isCrash = true;
-    }
+
+  if (
+    cx + dx < 0 ||
+    cx + dx >= boardSize ||
+    cy + dy < 0 ||
+    cy + dy >= boardSize - 1
+  ) {
+    ndx = dy;
+    ndy = -dx;
+    nx = cx + ndx;
+    ny = cy + ndy;
   }
-  if (nx < 0) {
-    nx = 0;
-    dx = -dx;
-  }
-  if (ny < 0) {
-    ny = 0;
-    dy = -dy;
-  }
+  // if (cx + dx >= boardSize) {
+  //   ndx = dy;
+  //   ndy = -dx;
+  //   nx = cx + ndx;
+  //   ny = cy + ndy;
+  // }
+  // if (cy + dy < 0) {
+  //   ndx = dy;
+  //   ndy = -dx;
+  //   nx = cx + ndx;
+  //   ny = cy + ndy;
+  // }
+  // if (cy + dy >= boardSize - 1) {
+  //   if (willHitPaddle(cx + dx, paddleXPos)) {
+  //     ndx = dy;
+  //     ndy = -dx;
+  //     nx = cx + ndx;
+  //     ny = cy + ndy;
+  //   } else {
+  //     isCrash = true;
+  //   }
+  // }
+
+  ndx = dy;
+  ndy = -dx;
+
+  nx = cx + ndx;
+  ny = cy + ndy;
+
   return {
     newPos: <Position>[nx, ny],
-    newDir: <Position>[dx, dy],
+    newDir: <Position>[ndx, ndy],
     isCrash
   };
-};
-
-const checkHitBrick = function(bricks: Position[], ballPos: Position) {
-  const idx = itemIdxInArray(bricks, ballPos);
 };
 
 const getBallPos = function(
@@ -53,13 +75,11 @@ const getBallPos = function(
   paddleXPos: number,
   bricks: Position[]
 ) {
-  const newPos = <Position>[x + dir[0], y + dir[1]];
-  let a = checkBoundary(newPos, dir, paddleXPos);
-  // checkHitBrick(bricks, a.newPos);
+  let a = getPosition([x, y], dir, paddleXPos);
   const idx = itemIdxInArray(bricks, a.newPos);
-  if(!!idx){
+  if (!!idx) {
     // Hit a Brick...
-    
+    const brick = bricks[idx];
   }
 
   return a;
