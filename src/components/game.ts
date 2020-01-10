@@ -1,55 +1,68 @@
-import { ctx } from "./initSetup";
-import { Position } from "./types";
+import { Position, Brick } from "./types";
+import { initPaddleX, initBallDir, initBallPos } from "./constants";
+import {
+  clearCanvas,
+  drawPaddle,
+  handleBricks,
+  handleBall,
+  showGameOverText,
+  movePaddle
+} from "./initSetup";
 
-import { Paddle } from "./paddle";
-import { Ball } from "./ball";
-import { Bricks } from "./bricks";
-import { clear } from "./helpers";
-
-// CTX Based Draw Functions
-const clearCanvas = clear(ctx);
-const { drawPaddle, movePaddle } = Paddle(ctx);
-const handleBall = Ball(ctx);
-const handleBricks = Bricks(ctx);
-
-// 1
-// clearCanvas();
-
-// 2
-let paddlePos = 15;
-drawPaddle(paddlePos);
-document.addEventListener("keydown", (event: KeyboardEvent) => {
-  paddlePos = movePaddle(paddlePos, event.key);
-});
-
-// 3
-let ballPos: Position = [paddlePos + 1, 29];
-let ballDir: Position = [1, -1];
-
-// 4
-let bricks: Position[] = [
-  [1, 2],
-  [3, 2],
-  [5, 2],
-  [7, 2],
-  [9, 2],
-  [11, 2],
-  [13, 2],
-  [15, 2],
-  [17, 2]
-];
-
-const runGame = (i?: number) => {
-  clearCanvas();
-  drawPaddle(paddlePos);
-  let b = handleBall(ballPos, ballDir, paddlePos, bricks);
-  if (b.isCrash) {
-    console.log("Ball Crashed");
-    clearInterval(i);
-    return;
+export class Game {
+  reqId: number;
+  game = false;
+  paddleX = initPaddleX;
+  ballPos: Position = initBallPos;
+  ballDir: Position = initBallDir;
+  bricks: Brick[];
+  constructor(bricks: Brick[]) {
+    this.bricks = bricks;
+    this.paddle();
+    this.reqId = -1;
   }
-  ballPos = b.newPos;
-  ballDir = b.newDir;
-};
 
-const i = setInterval(() => runGame(i), 50);
+  paddle = () => {
+    document.addEventListener("keydown", (event: KeyboardEvent) => {
+      if (this.game) this.paddleX = movePaddle(this.paddleX, event.key);
+    });
+  };
+  runGame = () => {
+    clearCanvas();
+    drawPaddle(this.paddleX);
+    handleBricks(this.bricks);
+    let b = handleBall(this.ballPos, this.ballDir, this.paddleX, this.bricks);
+    if (b.isCrash) {
+      this.stopGame("Crash");
+      return;
+    }
+    this.ballPos = b.newPos;
+    this.ballDir = b.newDir;
+    if (b.idx) this.bricks.splice(b.idx, 1);
+
+    if (this.bricks.length === 0) {
+      this.stopGame("Won");
+      return;
+    }
+    window.requestAnimationFrame(this.runGame);
+  };
+
+  start = () => {
+    this.game = true;
+    this.reqId = window.requestAnimationFrame(this.runGame);
+  };
+
+  stopGame = (type: string) => {
+    this.game = false;
+    window.cancelAnimationFrame(this.reqId);
+    clearCanvas();
+    showGameOverText(type);
+  };
+
+  status = () => {
+    return {
+      status: this.game,
+      bricksLeft: this.bricks.length
+    };
+  };
+}

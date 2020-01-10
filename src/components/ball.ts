@@ -1,66 +1,61 @@
-import { Position } from "./types";
-import { boardSize, paddleWidth } from "./constants";
+import { Position, Brick } from "./types";
+import {
+  paddleWidth,
+  ballRadius,
+  ballBottom,
+  canvasWidth,
+  brickHeight,
+  brickWidth
+} from "./constants";
 import { itemIdxInArray } from "./helpers";
 
-const willHitPaddle = (nx: number, paddleXPos: number) => {
-  const diff = nx - paddleXPos;
-  if (diff < 0 || diff > paddleWidth) return false;
-  return true;
+const willHitPaddle = (nx: number, paddleX: number) => {
+  return nx > paddleX - 2 * ballRadius && nx < paddleX + paddleWidth;
 };
 
-const getPosition = (
-  [cx, cy]: Position,
-  [dx, dy]: Position,
-  paddleXPos: number
+const getNextPosition = (
+  [cx, cy]: Position, // current position
+  [dx, dy]: Position, // current direction
+  paddleX: number
 ) => {
   let isCrash = false;
   let nx = cx,
     ny = cy,
     ndx = dx,
     ndy = dy;
-  if (cy + dy >= boardSize - 1 && !willHitPaddle(cx + dx, paddleXPos)) {
-    return { isCrash: true };
+
+  if (cx + dx > canvasWidth - 2 * ballRadius) {
+    nx = canvasWidth - 2 * ballRadius;
+    const factor = (nx - cx) / dx;
+    ny = cy + dy * factor;
+    ndx = -dx;
+  }
+  if (cx + dx < 0) {
+    nx = 0;
+    const factor = (nx - cx) / dx;
+    ny = cy + dy * factor;
+    ndx = -dx;
+  }
+  if (cy + dy < 0) {
+    ny = 0;
+    const factor = (ny - cy) / dy;
+    nx = cx + dx * factor;
+    ndy = -dy;
   }
 
-  if (
-    cx + dx < 0 ||
-    cx + dx >= boardSize ||
-    cy + dy < 0 ||
-    cy + dy >= boardSize - 1
-  ) {
-    ndx = dy;
-    ndy = -dx;
-    nx = cx + ndx;
-    ny = cy + ndy;
+  if (cy + dy > ballBottom) {
+    if (!willHitPaddle(cx + dx, paddleX)) {
+      isCrash = true;
+    } else {
+      ny = ballBottom;
+      const factor = (ny - cy) / dx;
+      nx = cx + dx * factor;
+      ndy = -dy;
+    }
+  } else {
+    nx = cx + dx;
+    ny = cy + dy;
   }
-  // if (cx + dx >= boardSize) {
-  //   ndx = dy;
-  //   ndy = -dx;
-  //   nx = cx + ndx;
-  //   ny = cy + ndy;
-  // }
-  // if (cy + dy < 0) {
-  //   ndx = dy;
-  //   ndy = -dx;
-  //   nx = cx + ndx;
-  //   ny = cy + ndy;
-  // }
-  // if (cy + dy >= boardSize - 1) {
-  //   if (willHitPaddle(cx + dx, paddleXPos)) {
-  //     ndx = dy;
-  //     ndy = -dx;
-  //     nx = cx + ndx;
-  //     ny = cy + ndy;
-  //   } else {
-  //     isCrash = true;
-  //   }
-  // }
-
-  ndx = dy;
-  ndy = -dx;
-
-  nx = cx + ndx;
-  ny = cy + ndy;
 
   return {
     newPos: <Position>[nx, ny],
@@ -70,35 +65,47 @@ const getPosition = (
 };
 
 const getBallPos = function(
-  [x, y]: Position,
+  ballPos: Position,
   dir: Position,
-  paddleXPos: number,
-  bricks: Position[]
+  paddleX: number,
+  bricks: Brick[]
 ) {
-  let a = getPosition([x, y], dir, paddleXPos);
-  const idx = itemIdxInArray(bricks, a.newPos);
-  if (!!idx) {
-    // Hit a Brick...
-    const brick = bricks[idx];
-  }
+  const r = getNextPosition(ballPos, dir, paddleX);
+  if (r.isCrash) return { ...r, idx: null };
+  const idx = itemIdxInArray(bricks, r.newPos);
+  if (idx === null) return { ...r, idx: null };
+  // Find new Direction and newPos...
+  console.log("IDX", idx);
+  // const { bx, by, hard } = bricks[idx];
+  // if (!hard) {
+    return { ...r, idx };
+  // }
+  // Brick is hard, reverse direction...
+  // const top = by - 2 * ballRadius > ballPos[1];
+  // const bottom = ballPos[1] > by + brickHeight + ballRadius;
+  // const middleY = !top && !bottom;
 
-  return a;
+  // const left = bx - ballRadius - ballPos[0] > ballRadius;
+  // const right = ballPos[0] > bx + brickWidth + ballRadius;
+  // const middleX = !left && !right;
+
+  // return { ...r, idx };
 };
 
 const fillBall = (ctx: CanvasRenderingContext2D, [x, y]: Position) => {
   ctx.beginPath();
-  ctx.fillStyle = "#2a98ef";
-  ctx.arc(x + 0.5, y + 0.5, 0.5, 0, 2 * Math.PI);
+  ctx.fillStyle = "red";
+  ctx.arc(x + ballRadius, y + ballRadius, ballRadius, 0, 2 * Math.PI);
   ctx.fill();
 };
 
 export const Ball = (ctx: CanvasRenderingContext2D) => (
   ballPos: Position,
   ballDir: Position,
-  paddleXPos: number,
-  bricks: Position[]
+  paddleX: number,
+  bricks: Brick[]
 ) => {
-  const r = getBallPos(ballPos, ballDir, paddleXPos, bricks);
+  const r = getBallPos(ballPos, ballDir, paddleX, bricks);
   if (r.isCrash) return r;
   fillBall(ctx, r.newPos);
   return r;

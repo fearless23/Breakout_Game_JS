@@ -8,7 +8,19 @@
     <title>HTML Canvas Breakout Game</title>
   </head>
   <body>
-    <canvas id="app"></canvas>
-    <script src="components/game.ts"></script>
+    <section id="game">
+      <header>
+        <div>Breakout Game</div>
+        <div class="status">
+          <div>Bricks: <span id="bricks"></span></div>
+          <div>Points: <span id="points"></span></div>
+        </div>
+        <div class="btn-grp">
+          <button class="btn" id="startBtn">Play</button>
+        </div>
+      </header>
+      <canvas id="app"></canvas>
+    </section>
+    <script src="index.ts"></script>
   </body>
 </html>
