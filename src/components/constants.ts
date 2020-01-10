@@ -25,7 +25,7 @@ export const initBallPos = <Position>[
   paddleY - 2 * ballRadius
 ]; // on the paddle
 export const initBallDir = <Position>[
-  ballRadius * 2 * ballSpeed,
+  ballRadius * 1.5 * ballSpeed,
   -ballRadius * ballSpeed
 ]; // to right-top
 

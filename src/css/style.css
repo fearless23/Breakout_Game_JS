@@ -111,6 +111,7 @@ div#overlay.hide {
   right: 100%;
   height: 0;
   display: none;
+  z-index: -100;
 }
 
 

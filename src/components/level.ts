@@ -32,6 +32,7 @@ export class Level {
     lives: number,
     currLevel: number
   ) {
+    clearCanvas();
     this.bricks = k.bricks;
     this.totalBricks = k.totalBricks;
     this.hardBricks = k.hardBricks;
@@ -63,7 +64,6 @@ export class Level {
     this.ballDir = b.newDir;
     // Increase speed when 20% left, once..
     if (!this.speedIncreased) {
-      this.speedIncreased = true;
       this.ballDir = this.increaseSpeed();
     }
     if (b.idx !== null) this.bricks.splice(b.idx, 1);
@@ -83,7 +83,11 @@ export class Level {
     const shouldIncrSpeed =
       (this.bricks.length - this.hardBricks) / this.softBricks <= 0.2;
     if (!shouldIncrSpeed) return this.ballDir;
-    return <Position>this.ballDir.map(d => d * 1.1);
+    else {
+      this.speedIncreased = true;
+      console.log("SPEED INCREASED")
+      return <Position>this.ballDir.map(d => d * 1.25);
+    }
   };
 
   crashed = () => {
@@ -94,7 +98,9 @@ export class Level {
       this.paddleX = initPaddleX;
       this.ballPos = initBallPos;
       this.ballDir = initBallDir;
-      setTimeout(() => this.runLevel(), 700);
+      setTimeout(() => {
+        this.runLevel();
+      }, 700);
     } else {
       this.stopLevel();
     }
