@@ -1,18 +1,18 @@
 import { Position } from "./types";
 
-export const canvasWidth = 600;
-export const canvasHeight = 300;
+export const canvasWidth = 1200;
+export const canvasHeight = 600;
 
 // Paddle Features
-export const paddleWidth = canvasWidth / 1;
+export const paddleWidth = canvasWidth / 4;
 export const paddleHeight = 15;
 export const paddleY = canvasHeight - paddleHeight; // Calculated but constant
 export const paddleSpeed = 100;
 
 // Ball Features
-export const ballRadius = 10;
+export const ballRadius = 7;
 export const ballBottom = canvasHeight - 2 * ballRadius - paddleHeight; //calc
-export const ballSpeed = 0.25;
+export const ballSpeed = 0.4;
 
 // Brick Features
 export const brickWidth = 50;
@@ -28,3 +28,7 @@ export const initBallDir = <Position>[
   ballRadius * ballSpeed,
   -ballRadius * ballSpeed
 ]; // to right-top
+
+// Game/Level Features
+export const maxLevels = 5;
+export const maxLives = 10;

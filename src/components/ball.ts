@@ -64,37 +64,85 @@ const getNextPosition = (
   };
 };
 
+const getCorners = ([cx, cy]: Position, k: any) => {
+  const { bl, br, bt, bb } = k;
+  let cornerY = 0;
+  const top = bt > cy;
+  const bottom = cy > bb;
+  const middleY = !top && !bottom;
+  if (top) cornerY = 1;
+  if (middleY) cornerY = 2;
+  if (bottom) cornerY = 3;
+
+  let cornerX = 0;
+  const left = bl > cx;
+  const right = cy > br;
+  const middleX = !left && !right;
+  if (left) cornerX = 1;
+  if (middleX) cornerX = 2;
+  if (right) cornerX = 3;
+
+  return (cornerY - 1) * 3 + cornerX;
+};
+
+const ifItemOneOf = (item: number, ...items: number[]) => {
+  return items.some(i => i === item);
+};
+
 const getBallPos = function(
-  ballPos: Position,
-  dir: Position,
+  [cx, cy]: Position,
+  [dx, dy]: Position,
   paddleX: number,
   bricks: Brick[]
 ) {
-  const r = getNextPosition(ballPos, dir, paddleX);
+  const r = getNextPosition([cx, cy], [dx, dy], paddleX);
   if (r.isCrash) return { ...r, idx: null };
-  const idx = itemIdxInArray(bricks, r.newPos);
+  const { idx, hard, ...k } = itemIdxInArray(bricks, r.newPos);
+  // No Brick touched
   if (idx === null) return { ...r, idx: null };
-  // Find new Direction and newPos...
-  console.log("IDX", idx);
-  // const { bx, by, hard } = bricks[idx];
-  // if (!hard) {
-    return { ...r, idx };
-  // }
-  // Brick is hard, reverse direction...
-  // const top = by - 2 * ballRadius > ballPos[1];
-  // const bottom = ballPos[1] > by + brickHeight + ballRadius;
-  // const middleY = !top && !bottom;
+  // Brick is soft go through
+  if (!hard) return { ...r, idx: idx };
+  // Brick is hard, reverse direction..
+  const payload = { isCrash: false, idx: null };
+  const corner = getCorners([cx, cy], k);
 
-  // const left = bx - ballRadius - ballPos[0] > ballRadius;
-  // const right = ballPos[0] > bx + brickWidth + ballRadius;
-  // const middleX = !left && !right;
+  ifItemOneOf(corner, 1, 2, 3);
+  if (ifItemOneOf(corner, 1, 2, 3))
+    // Top of Brick
+    return {
+      ...payload,
+      newDir: <Position>[dx, -dy],
+      newPos: <Position>[cx, k.bt]
+    };
+  if (ifItemOneOf(corner, 7, 8, 9))
+    // Bottom of Brick
+    return {
+      ...payload,
+      newDir: <Position>[dx, -dy],
+      newPos: <Position>[cx, k.bb]
+    };
+  if (ifItemOneOf(corner, 4))
+    // Left of Brick
+    return {
+      ...payload,
+      newDir: <Position>[-dx, dy],
+      newPos: <Position>[k.bl, cy]
+    };
+  if (ifItemOneOf(corner, 5,6))
+    // Right of Brick
+    return {
+      ...payload,
+      newDir: <Position>[-dx, dy],
+      newPos: <Position>[k.br, cy]
+    };
 
-  // return { ...r, idx };
+  console.log("WHAT!!!!", corner);
+  return { ...r, idx: null };
 };
 
 const fillBall = (ctx: CanvasRenderingContext2D, [x, y]: Position) => {
   ctx.beginPath();
-  ctx.fillStyle = "red";
+  ctx.fillStyle = "purple";
   ctx.arc(x + ballRadius, y + ballRadius, ballRadius, 0, 2 * Math.PI);
   ctx.fill();
 };

@@ -6,4 +6,3 @@ export type Brick = {
   hard: boolean;
 };
 export type Position = [number, number];
-export const sampleBrick: Brick = { bx: 4, by: 4, hard: false };

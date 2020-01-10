@@ -29,7 +29,8 @@ header {
   align-items: center;
 }
 
-span#bricksLeft, span#points {
+span#bricksLeft,
+span#points {
   font-size: 1.2em;
   font-family: monospace;
 }
@@ -70,4 +71,14 @@ span#bricksLeft, span#points {
 
 canvas {
   border: 2px solid #4d5256;
+}
+
+/* Hide All imgs */
+img {
+  position: absolute;
+  width: 0;
+  height: 0;
+  visibility: hidden;
+  opacity: 0;
+  z-index: -100;
 }

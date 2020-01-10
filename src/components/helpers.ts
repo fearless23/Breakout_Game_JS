@@ -11,27 +11,25 @@ export const randInt = function(min: number, max: number): number {
   return Math.floor(Math.random() * max + min);
 };
 
-export const itemIdxInArray = function(
-  arr: Brick[],
-  [x, y]: Position
-): number | null {
+export const itemIdxInArray = function(arr: Brick[], [x, y]: Position) {
   let i = 0;
-  let found = false;
+  let idx = null;
+  let bl, br, bt, bb, hard;
   while (i < arr.length) {
-    const { bx, by } = arr[i];
-
-    const bl = bx - 2 * ballRadius;
-    const br = bx + brickWidth;
-    const bt = by - 2 * ballRadius;
-    const bb = by + brickHeight;
+    const { bx, by, hard: h } = arr[i];
+    hard = h;
+    bl = bx - 2 * ballRadius;
+    br = bx + brickWidth;
+    bt = by - 2 * ballRadius;
+    bb = by + brickHeight;
 
     if (x >= bl && x <= br && y >= bt && y <= bb) {
-      found = true;
+      idx = i;
       break;
     }
     i++;
   }
-  return found ? i : null;
+  return { idx, bl, br, bt, bb, hard };
 };
 
 export const clear = (ctx: CanvasRenderingContext2D) => () => {

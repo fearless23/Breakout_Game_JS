@@ -1,69 +1,80 @@
-import { Position, Brick } from "./types";
-import { initPaddleX, initBallDir, initBallPos } from "./constants";
+import { Level } from "./level";
 import {
-  clearCanvas,
-  drawPaddle,
-  handleBricks,
-  handleBall,
-  showGameOverText,
-  movePaddle
+  startBtn,
+  setStartBtn,
+  setPointsAndBricks,
+  setLevel,
+  setLives
 } from "./initSetup";
+import { makeBricks } from "./createBricks";
+
+import { maxLives, maxLevels } from "./constants";
 
 export class Game {
-  reqId: number;
-  game = false;
-  paddleX = initPaddleX;
-  ballPos: Position = initBallPos;
-  ballDir: Position = initBallDir;
-  bricks: Brick[];
-  constructor(bricks: Brick[]) {
-    this.bricks = bricks;
-    this.paddle();
-    this.reqId = -1;
+  level: number = 1;
+  points: number = 0;
+  livesLeft: number;
+  maxLevel: number;
+
+  constructor() {
+    this.maxLevel = maxLevels;
+    this.livesLeft = maxLives;
+    this.initBtnCtrl();
   }
 
-  paddle = () => {
-    document.addEventListener("keydown", (event: KeyboardEvent) => {
-      if (this.game) this.paddleX = movePaddle(this.paddleX, event.key);
-    });
+  initBtnCtrl() {
+    startBtn.addEventListener("mousedown", _ => this.handleLevel(this.level));
+  }
+
+  reset = (i: number) => {
+    this.level = 1;
+    this.points = 0;
+    this.livesLeft = maxLives;
+    clearInterval(i);
   };
-  runGame = () => {
-    clearCanvas();
-    drawPaddle(this.paddleX);
-    handleBricks(this.bricks);
-    let b = handleBall(this.ballPos, this.ballDir, this.paddleX, this.bricks);
-    if (b.isCrash) {
-      this.stopGame("Crash");
+
+  btnCtrl = (i: number, gameStatus: any, softBricks: number) => {
+    const { status, bricksLeft, lifes } = gameStatus;
+    // Level is Running
+    if (status) {
+      setPointsAndBricks(this.points, bricksLeft, softBricks);
+      setLives(lifes);
       return;
     }
-    this.ballPos = b.newPos;
-    this.ballDir = b.newDir;
-    if (b.idx) this.bricks.splice(b.idx, 1);
 
-    if (this.bricks.length === 0) {
-      this.stopGame("Won");
+    // Level Stopped
+    if (bricksLeft !== 0) {
+      // Level Lost
+      setStartBtn("Lost - Restart", false);
+      this.reset(i);
       return;
     }
-    window.requestAnimationFrame(this.runGame);
+    // Level Won but it was last Level
+    if (this.level >= this.maxLevel) {
+      setStartBtn("Game Won, Restart", false);
+      this.reset(i);
+      return;
+    }
+    // Level Won - Continue to next Level with button press
+    setStartBtn("Start Next Level", false);
+    setPointsAndBricks(this.points, bricksLeft, softBricks);
+    setLives(lifes);
+    this.level++;
   };
 
-  start = () => {
-    console.log("START")
-    this.game = true;
-    this.reqId = window.requestAnimationFrame(this.runGame);
-  };
+  handleLevel = (level: number) => {
+    const k = makeBricks(50, level * 6);
+    const currLevel = new Level(k, this.livesLeft);
+    currLevel.start();
 
-  stopGame = (type: string) => {
-    this.game = false;
-    window.cancelAnimationFrame(this.reqId);
-    clearCanvas();
-    showGameOverText(type);
-  };
+    setStartBtn("Running", true);
+    setPointsAndBricks(this.points, k.softBricks, k.softBricks);
+    setLevel(level);
+    setLives(this.livesLeft);
 
-  status = () => {
-    return {
-      status: this.game,
-      bricksLeft: this.bricks.length
-    };
+    const i = setInterval(
+      () => this.btnCtrl(i, currLevel.status(), k.softBricks),
+      100
+    );
   };
 }
