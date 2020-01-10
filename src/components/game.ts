@@ -4,7 +4,9 @@ import {
   setStartBtn,
   setPointsAndBricks,
   setLevel,
-  setLives
+  setLives,
+  removeOverlay,
+  showOverLay
 } from "./initSetup";
 import { makeBricks } from "./createBricks";
 
@@ -33,38 +35,49 @@ export class Game {
     clearInterval(i);
   };
 
-  btnCtrl = (i: number, gameStatus: any, softBricks: number) => {
-    const { status, bricksLeft, lifes } = gameStatus;
+  btnCtrl = (i: number, levelStatus: any, softBricks: number) => {
+    const { status, bricksLeft, lives } = levelStatus;
     // Level is Running
     if (status) {
       setPointsAndBricks(this.points, bricksLeft, softBricks);
-      setLives(lifes);
+      setLives(lives);
       return;
     }
 
-    // Level Stopped
+    // Level Stopped and 1,2,3
+
+    // 1. Level Lost
     if (bricksLeft !== 0) {
-      // Level Lost
       setStartBtn("Lost - Restart", false);
+      setPointsAndBricks(this.points, bricksLeft, softBricks);
+      showOverLay(this.level, false, this.level === this.maxLevel);
       this.reset(i);
       return;
     }
-    // Level Won but it was last Level
+    // 2. Level Won but it was last Level
     if (this.level >= this.maxLevel) {
       setStartBtn("Game Won, Restart", false);
+      setPointsAndBricks(this.points, bricksLeft, softBricks);
+      showOverLay(this.level, true, true);
       this.reset(i);
       return;
     }
-    // Level Won - Continue to next Level with button press
+    // status = false, bricksLeft===0, level < maxLevel
+    // 3. Level Won - Continue to next Level with button press
     setStartBtn("Start Next Level", false);
     setPointsAndBricks(this.points, bricksLeft, softBricks);
-    setLives(lifes);
+    showOverLay(this.level, true, false);
+    setLives(lives);
+    this.points += softBricks * 10;
     this.level++;
+    clearInterval(i);
   };
 
   handleLevel = (level: number) => {
-    const k = makeBricks(50, level * 6);
-    const currLevel = new Level(k, this.livesLeft);
+    const k = makeBricks(level, level * 6);
+    // Remove overlay...
+    removeOverlay();
+    const currLevel = new Level(k, this.livesLeft, level);
     currLevel.start();
 
     setStartBtn("Running", true);

@@ -49,19 +49,19 @@ const shouldBeHardBrick = (prob: number) => {
   return Math.random() > 1 - prob / 100;
 };
 
-export const makeBricks = (maxBricks: number, hardBricksProb: number = 0) => {
+export const makeBricks = (
+  rowsToCreate: number,
+  hardBricksProb: number = 0
+) => {
   const bricks: Brick[] = [];
   const maxRows = getMaxRows();
   const maxBricksInRow = getMaxBricksInRow();
-  let bricksCreated = 0;
+  const rowsGen = Math.min(rowsToCreate, maxRows);
+  let bricksCreated = 2;
   let hardBricksCreated = 0;
 
-  main: for (let i = 0; i < maxRows; i++) {
-    for (let j = 0; j < maxBricksInRow; j++) {
-      if (bricksCreated >= maxBricks) {
-        break main;
-      }
-      bricksCreated++;
+  for (let i = 1; i < 2; i++) {
+    for (let j = 6; j < 8; j++) {
       const hard =
         hardBricksProb === 0 ? false : shouldBeHardBrick(hardBricksProb);
       if (hard) hardBricksCreated++;

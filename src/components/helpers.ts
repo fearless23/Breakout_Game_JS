@@ -41,6 +41,6 @@ export const gameOverText = (ctx: CanvasRenderingContext2D) => (
 ) => {
   const size = 30;
   ctx.font = size + "px Fira Code";
-  const txtSize = size * txt.length;
+  const txtSize = (size * txt.length) / 2;
   ctx.fillText(txt, canvasWidth / 2 - txtSize / 2, canvasHeight / 2 - size / 2);
 };

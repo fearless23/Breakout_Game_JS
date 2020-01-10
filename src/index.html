@@ -12,25 +12,21 @@
       <header>
         <div>Breakout Game</div>
         <div class="status">
-          <div>Bricks: <span id="bricks"></span></div>
-          <div>Level: <span id="level"></span></div>
-          <div>Lifes: <span id="lifes"></span></div>
-          <div>Points: <span id="points"></span></div>
+          <div>Level: <span id="level">0</span></div>
+          <div>Bricks Left: <span id="bricks">0</span></div>
+          <div>Lives Left: <span id="lives">0</span></div>
+          <div>Level Points: <span id="level_points">0</span></div>
+          <div>Total Points: <span id="total_points">0</span></div>
         </div>
         <div class="btn-grp">
           <button class="btn" id="startBtn">Play</button>
         </div>
       </header>
+      <div id="overlay"></div>
       <canvas id="app"></canvas>
     </section>
-    <img id="soft" width="50" height="15" src="imgs/brick.jpeg" alt="Brick" />
-    <img
-      id="hard"
-      width="50"
-      height="15"
-      src="imgs/stoneWall.jpeg"
-      alt="Stone"
-    />
+    <img id="soft" src="imgs/brick.jpeg" />
+    <img id="hard" src="imgs/stoneWall.jpeg" />
     <script src="index.ts"></script>
   </body>
 </html>

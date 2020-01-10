@@ -1,8 +1,8 @@
-import { canvasHeight, canvasWidth } from "./constants";
+import { canvasHeight, canvasWidth, maxLives, maxLevels } from "./constants";
 
 // Set HTML Game Section
 const gameSection = <HTMLElement>document.getElementById("game");
-gameSection.style.width = `${canvasWidth}px`;
+gameSection.style.width = `${canvasWidth + 4}px`;
 
 // Set Canvas Size
 const canvas = <HTMLCanvasElement>document.getElementById("app");
@@ -24,17 +24,24 @@ export const handleBricks = Bricks(ctx);
 
 export const startBtn = <HTMLButtonElement>document.getElementById("startBtn");
 const bricksSpan = <HTMLSpanElement>document.getElementById("bricks");
-const pointsSpan = <HTMLSpanElement>document.getElementById("points");
-const livesSpan = <HTMLSpanElement>document.getElementById("lifes");
+const levelPointsSpan = <HTMLSpanElement>(
+  document.getElementById("level_points")
+);
+const totalPointsSpan = <HTMLSpanElement>(
+  document.getElementById("total_points")
+);
+const livesSpan = <HTMLSpanElement>document.getElementById("lives");
 const levelSpan = <HTMLSpanElement>document.getElementById("level");
+const overlayDiv = <HTMLDivElement>document.getElementById("overlay");
 
 export const setPointsAndBricks = (
   points: number,
   bricksLeft: number,
   totalBricks: number
 ) => {
-  bricksSpan.innerText = String(bricksLeft) + " of " + String(totalBricks);
-  pointsSpan.innerText = String(points + (totalBricks - bricksLeft) * 10);
+  bricksSpan.innerText = String(bricksLeft) + " / " + String(totalBricks);
+  levelPointsSpan.innerText = String((totalBricks - bricksLeft) * 10);
+  totalPointsSpan.innerText = String(points + (totalBricks - bricksLeft) * 10);
 };
 
 export const setStartBtn = (txt: string, disabled: boolean) => {
@@ -48,8 +55,19 @@ export const setStartBtn = (txt: string, disabled: boolean) => {
 };
 
 export const setLives = (lives: number) => {
-  livesSpan.innerText = String(lives);
+  livesSpan.innerText = String(lives) + " / " + String(maxLives);
 };
 export const setLevel = (level: number) => {
-  levelSpan.innerText = String(level);
+  levelSpan.innerText = String(level) + " / " + String(maxLevels);
+};
+
+export const removeOverlay = () => {
+  overlayDiv.classList.add("hide");
+};
+export const showOverLay = (
+  currLevel: number,
+  levelWon: boolean,
+  wasLastLevel: boolean
+) => {
+  overlayDiv.classList.remove("hide");
 };
