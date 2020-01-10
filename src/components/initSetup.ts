@@ -70,4 +70,8 @@ export const showOverLay = (
   wasLastLevel: boolean
 ) => {
   overlayDiv.classList.remove("hide");
+  overlayDiv.innerHTML = `
+    <p>You ${levelWon ? "won" : "lost"} level ${currLevel}</p>
+    <p>${levelWon ? wasLastLevel? "You won the game": "Continue to next level": "Restart the game"}</p>
+  `;
 };

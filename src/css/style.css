@@ -91,6 +91,9 @@ div#overlay {
   right: 0;
   z-index: 100;
   background: #000000b8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 div#overlay.hide {
