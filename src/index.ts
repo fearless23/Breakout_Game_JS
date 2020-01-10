@@ -41,13 +41,13 @@ const btnCtrl = (
 };
 
 const handleGame = () => {
-  // const game = new Game([...bricks]);
-  // game.start();
+  const game = new Game([...bricks]);
+  game.start();
   setBtn("Running", true);
   setTxt(bricks.length, bricks.length);
-  // const i = setInterval(() => btnCtrl(i, game.status()), 100);
+  const i = setInterval(() => btnCtrl(i, game.status()), 100);
 };
 
 startBtn.addEventListener("mousedown", _ => {
-  handleGame()
+  handleGame();
 });
