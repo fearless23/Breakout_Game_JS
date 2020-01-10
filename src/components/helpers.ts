@@ -29,6 +29,7 @@ export const itemIdxInArray = function(
       found = true;
       break;
     }
+    i++;
   }
   return found ? i : null;
 };

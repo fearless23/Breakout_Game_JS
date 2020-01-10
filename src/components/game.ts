@@ -48,6 +48,7 @@ export class Game {
   };
 
   start = () => {
+    console.log("START")
     this.game = true;
     this.reqId = window.requestAnimationFrame(this.runGame);
   };
