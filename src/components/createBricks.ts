@@ -45,8 +45,8 @@ const makeBrick = (bx: number, by: number, hard: boolean) => {
   return <Brick>{ bx, by, hard };
 };
 
-const shouldBeHardBrick = (prob: number) => {
-  return Math.random() > 1 - prob / 100;
+const isHard = (prob: number) => {
+  return Math.random() > Math.max(0.2, 1 - prob / 100);
 };
 
 export const makeBricks = (
@@ -57,13 +57,12 @@ export const makeBricks = (
   const maxRows = getMaxRows();
   const maxBricksInRow = getMaxBricksInRow();
   const rowsGen = Math.min(rowsToCreate, maxRows);
-  let bricksCreated = 2;
+  let bricksCreated = rowsGen * maxBricksInRow;
   let hardBricksCreated = 0;
 
-  for (let i = 1; i < 2; i++) {
-    for (let j = 6; j < 8; j++) {
-      const hard =
-        hardBricksProb === 0 ? false : shouldBeHardBrick(hardBricksProb);
+  for (let i = 0; i < rowsGen; i++) {
+    for (let j = 0; j < maxBricksInRow; j++) {
+      const hard = hardBricksProb === 0 ? false : isHard(hardBricksProb);
       if (hard) hardBricksCreated++;
       const brick = makeBrick(getRowX(j), getRowY(i), hard);
       bricks.push(brick);

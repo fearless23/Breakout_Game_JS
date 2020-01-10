@@ -17,10 +17,11 @@ export class Game {
   points: number = 0;
   livesLeft: number;
   maxLevel: number;
-
+  intervalId: number;
   constructor() {
     this.maxLevel = maxLevels;
     this.livesLeft = maxLives;
+    this.intervalId = -1;
     this.initBtnCtrl();
   }
 
@@ -28,14 +29,14 @@ export class Game {
     startBtn.addEventListener("mousedown", _ => this.handleLevel(this.level));
   }
 
-  reset = (i: number) => {
+  reset = () => {
     this.level = 1;
     this.points = 0;
     this.livesLeft = maxLives;
-    clearInterval(i);
+    clearInterval(this.intervalId);
   };
 
-  btnCtrl = (i: number, levelStatus: any, softBricks: number) => {
+  btnCtrl = (levelStatus: any, softBricks: number) => {
     const { status, bricksLeft, lives } = levelStatus;
     // Level is Running
     if (status) {
@@ -51,7 +52,7 @@ export class Game {
       setStartBtn("Lost - Restart", false);
       setPointsAndBricks(this.points, bricksLeft, softBricks);
       showOverLay(this.level, false, this.level === this.maxLevel);
-      this.reset(i);
+      this.reset();
       return;
     }
     // 2. Level Won but it was last Level
@@ -59,7 +60,7 @@ export class Game {
       setStartBtn("Game Won, Restart", false);
       setPointsAndBricks(this.points, bricksLeft, softBricks);
       showOverLay(this.level, true, true);
-      this.reset(i);
+      this.reset();
       return;
     }
     // status = false, bricksLeft===0, level < maxLevel
@@ -70,7 +71,7 @@ export class Game {
     setLives(lives);
     this.points += softBricks * 10;
     this.level++;
-    clearInterval(i);
+    clearInterval(this.intervalId);
   };
 
   handleLevel = (level: number) => {
@@ -85,9 +86,9 @@ export class Game {
     setLevel(level);
     setLives(this.livesLeft);
 
-    const i = setInterval(
-      () => this.btnCtrl(i, currLevel.status(), k.softBricks),
-      100
+    this.intervalId = setInterval(
+      () => this.btnCtrl(currLevel.status(), k.softBricks),
+      500
     );
   };
 }

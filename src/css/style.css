@@ -22,6 +22,10 @@ header {
   margin-bottom: 1em;
 }
 
+.logo {
+  font-size: 30px;
+}
+
 .status {
   flex: 1;
   padding: 0 1em;
@@ -31,8 +35,9 @@ header {
 }
 
 div.status div span {
-  font-size: 1.2em;
+  font-size: 1em;
   font-family: monospace;
+  color: #2a98ef;
 }
 
 .btn-grp {
@@ -92,8 +97,10 @@ div#overlay {
   z-index: 100;
   background: #000000b8;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  color: white;
 }
 
 div#overlay.hide {
@@ -103,4 +110,15 @@ div#overlay.hide {
   left: 0;
   right: 100%;
   height: 0;
+  display: none;
+}
+
+
+footer {
+  display: flex;
+  padding: 1em;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* background-color: #4d5256; */
 }

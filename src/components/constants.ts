@@ -1,10 +1,10 @@
 import { Position } from "./types";
 
-export const canvasWidth = 1170;
-export const canvasHeight = 600;
+export const canvasWidth = 910;
+export const canvasHeight = 500;
 
 // Paddle Features
-export const paddleWidth = canvasWidth / 3;
+export const paddleWidth = canvasWidth / 5;
 export const paddleHeight = 15;
 export const paddleY = canvasHeight - paddleHeight; // Calculated but constant
 export const paddleSpeed = 100;
@@ -12,7 +12,7 @@ export const paddleSpeed = 100;
 // Ball Features
 export const ballRadius = 7;
 export const ballBottom = canvasHeight - 2 * ballRadius - paddleHeight; //calc
-export const ballSpeed = 0.4;
+export const ballSpeed = 0.45;
 
 // Brick Features
 export const brickWidth = 50;

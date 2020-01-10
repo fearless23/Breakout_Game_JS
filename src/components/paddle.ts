@@ -20,7 +20,7 @@ const getNextPos = function(paddleX: number, m: number): number {
 };
 
 const drawPaddle = (ctx: CanvasRenderingContext2D) => (paddleX: number) => {
-  ctx.fillStyle = "#2a98ef";
+  ctx.fillStyle = "#2eb364";
   ctx.fillRect(paddleX, paddleY, paddleWidth, paddleHeight);
 };
 

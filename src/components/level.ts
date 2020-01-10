@@ -11,7 +11,7 @@ import {
 
 export class Level {
   reqId: number = -1;
-  game = false;
+  levelStatus = false;
   paddleX = initPaddleX;
   ballPos: Position = initBallPos;
   ballDir: Position = initBallDir;
@@ -43,13 +43,13 @@ export class Level {
 
   paddle = () => {
     document.addEventListener("keydown", (event: KeyboardEvent) => {
-      if (this.game) this.paddleX = movePaddle(this.paddleX, event.key);
+      if (this.levelStatus) this.paddleX = movePaddle(this.paddleX, event.key);
     });
     drawPaddle(this.paddleX);
     handleBricks(this.bricks);
     handleBall(this.ballPos, this.ballDir, this.paddleX, this.bricks);
   };
-  runGame = () => {
+  runLevel = () => {
     clearCanvas();
     drawPaddle(this.paddleX);
     handleBricks(this.bricks);
@@ -69,14 +69,14 @@ export class Level {
     if (b.idx !== null) this.bricks.splice(b.idx, 1);
 
     if (this.bricks.length === this.hardBricks) {
-      this.stopGame();
+      this.stopLevel();
     }
-    window.requestAnimationFrame(this.runGame);
+    window.requestAnimationFrame(this.runLevel);
   };
 
   start = () => {
-    this.game = true;
-    this.reqId = window.requestAnimationFrame(this.runGame);
+    this.levelStatus = true;
+    this.reqId = window.requestAnimationFrame(this.runLevel);
   };
 
   increaseSpeed = () => {
@@ -88,29 +88,28 @@ export class Level {
 
   crashed = () => {
     if (this.lives > 0) {
+      window.cancelAnimationFrame(this.reqId);
+      clearCanvas();
       showGameOverText(`Crashed ${this.lives} lives left`);
       this.paddleX = initPaddleX;
       this.ballPos = initBallPos;
       this.ballDir = initBallDir;
-      setTimeout(() => {
-        this.runGame();
-      }, 1000);
+      setTimeout(() => this.runLevel(), 700);
     } else {
-      this.stopGame();
+      this.stopLevel();
     }
   };
 
-  stopGame = (type?: string) => {
-    this.game = false;
+  stopLevel = () => {
+    this.levelStatus = false;
     window.cancelAnimationFrame(this.reqId);
     clearCanvas();
-    // showGameOverText(type);
   };
 
   status = () => {
     return {
       lives: this.lives,
-      status: this.game,
+      status: this.levelStatus,
       bricksLeft: this.bricks.length - this.hardBricks
     };
   };

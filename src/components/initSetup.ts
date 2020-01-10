@@ -39,7 +39,7 @@ export const setPointsAndBricks = (
   bricksLeft: number,
   totalBricks: number
 ) => {
-  bricksSpan.innerText = String(bricksLeft) + " / " + String(totalBricks);
+  bricksSpan.innerText = String(bricksLeft) + "/" + String(totalBricks);
   levelPointsSpan.innerText = String((totalBricks - bricksLeft) * 10);
   totalPointsSpan.innerText = String(points + (totalBricks - bricksLeft) * 10);
 };
@@ -55,10 +55,10 @@ export const setStartBtn = (txt: string, disabled: boolean) => {
 };
 
 export const setLives = (lives: number) => {
-  livesSpan.innerText = String(lives) + " / " + String(maxLives);
+  livesSpan.innerText = String(lives) + "/" + String(maxLives);
 };
 export const setLevel = (level: number) => {
-  levelSpan.innerText = String(level) + " / " + String(maxLevels);
+  levelSpan.innerText = String(level) + "/" + String(maxLevels);
 };
 
 export const removeOverlay = () => {
@@ -70,8 +70,25 @@ export const showOverLay = (
   wasLastLevel: boolean
 ) => {
   overlayDiv.classList.remove("hide");
-  overlayDiv.innerHTML = `
-    <p>You ${levelWon ? "won" : "lost"} level ${currLevel}</p>
-    <p>${levelWon ? wasLastLevel? "You won the game": "Continue to next level": "Restart the game"}</p>
-  `;
+  if (levelWon && wasLastLevel) {
+    overlayDiv.innerHTML = `
+    <h3>You won level ${currLevel} and the game</h3>
+    <p>Restart the game</p>
+    `;
+    return;
+  }
+  if (!levelWon && wasLastLevel) {
+    overlayDiv.innerHTML = `
+    <h3>You lost level ${currLevel} and the game</h3>
+    <p>Restart the game</p>
+    `;
+    return;
+  }
+  if (levelWon && !wasLastLevel) {
+    overlayDiv.innerHTML = `
+    <h3>You won level ${currLevel}</h3>
+    <p>Continue to Level ${currLevel + 1}</p>
+    `;
+    return;
+  }
 };
