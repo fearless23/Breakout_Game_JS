@@ -1,6 +1,9 @@
 {
   "name": "breakout_game_js",
   "version": "1.0.0",
+  "engines": {
+    "node": "12.x"
+  },
   "description": "Javascript Canvas Breakout Game",
   "main": "index.js",
   "scripts": {
