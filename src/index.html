@@ -10,18 +10,15 @@
   <body>
     <section id="game">
       <header>
-        <div class="logo">Breakout Game</div>
-        <div class="status">
-          <div>Level: <span id="level">0</span></div>
-          <div>Bricks Left: <span id="bricks">0</span></div>
-          <div>Lives Left: <span id="lives">0</span></div>
-          <div>Level Points: <span id="level_points">0</span></div>
-          <div>Total Points: <span id="total_points">0</span></div>
-        </div>
-        <div class="btn-grp">
-          <button class="btn" id="startBtn">Play</button>
-        </div>
+        <div class="logo">Breakout</div>
       </header>
+      <div class="status">
+        <div>Level: <span id="level">0</span></div>
+        <div>Bricks: <span id="bricks">0</span></div>
+        <div>Lives: <span id="lives">0</span></div>
+        <div>Points: <span id="level_points">0</span></div>
+        <div>Total: <span id="total_points">0</span></div>
+      </div>
       <div id="overlay">
         <div>Welcome, to the Breakout Game</div>
         <p>Start by clicking button in right corner</p>
@@ -31,6 +28,7 @@
     <img id="soft" src="imgs/brick.jpeg" />
     <img id="hard" src="imgs/stoneWall.jpeg" />
     <footer>
+      <button class="btn" id="startBtn">Play</button>
       <p>Made by <a href="https://github.com/fearless23">Jaspreet Singh</a></p>
     </footer>
     <script src="index.ts"></script>

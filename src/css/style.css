@@ -20,17 +20,22 @@ header {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1em;
+  height: 2em;
 }
 
 .logo {
-  font-size: 30px;
+  font-size: 1.42em;
+  color: #2a98ef;
+  font-weight: bold;
 }
 
 .status {
+  box-sizing: border-box;
   flex: 1;
-  padding: 0 1em;
+  padding: 0;
   display: flex;
-  justify-content: space-around;
+  height: 2em;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -90,7 +95,7 @@ img {
 
 div#overlay {
   position: absolute;
-  top: 48px;
+  top: 5em;
   bottom: 0;
   left: 0;
   right: 0;
@@ -105,7 +110,7 @@ div#overlay {
 
 div#overlay.hide {
   position: absolute;
-  top: 48px;
+  top: 0;
   bottom: 100%;
   left: 0;
   right: 100%;
@@ -117,6 +122,7 @@ div#overlay.hide {
 
 footer {
   display: flex;
+  flex-direction: column;
   padding: 1em;
   align-items: center;
   justify-content: center;

@@ -1,7 +1,7 @@
 import { Position } from "./types";
 
-export const canvasWidth = 910;
-export const canvasHeight = 500;
+export const canvasWidth = 600;
+export const canvasHeight = canvasWidth*5/8;
 
 // Paddle Features
 export const paddleWidth = canvasWidth / 5;

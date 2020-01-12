@@ -51,6 +51,11 @@ const getNextPosition = (
       const factor = (ny - cy) / dx;
       nx = cx + dx * factor;
       ndy = -dy;
+      // IF hitting paddle
+      const paddleHitPosition = (nx - paddleX) / paddleWidth;
+      const f = paddleHitPosition >= 0.5 ? 1 : -1;
+      const f2 = 4 * Math.abs(paddleHitPosition - 0.5) + 0.5;
+      ndx = Math.abs(dx) * f2 * f;
     }
   } else {
     nx = cx + dx;
@@ -128,7 +133,7 @@ const getBallPos = function(
       newDir: <Position>[-dx, dy],
       newPos: <Position>[k.bl, cy]
     };
-  if (ifItemOneOf(corner, 5,6))
+  if (ifItemOneOf(corner, 5, 6))
     // Right of Brick
     return {
       ...payload,
