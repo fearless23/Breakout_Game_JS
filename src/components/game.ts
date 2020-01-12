@@ -135,7 +135,7 @@ export class Game {
   handleLevel = (level: number) => {
     let k: LevelInfo = this.k;
     if (this.k.softBricks === 0) {
-      k = makeBricks(level, level * 6);
+      k = makeBricks(level + 2, level * 6);
     }
     removeOverlay();
     const currLevel = new Level(k, this.p);
