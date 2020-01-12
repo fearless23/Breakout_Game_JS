@@ -1,9 +1,8 @@
-import { Position, Brick } from "./types";
+import { Position, Brick, LevelInfo, PlayerInfo } from "./types";
 import {
   initPaddleX,
   initBallDir,
   initBallPos,
-  ballSpeed,
   paddleWidth,
   canvasWidth
 } from "./constants";
@@ -12,84 +11,93 @@ import {
   drawPaddle,
   handleBricks,
   handleBall,
-  showGameOverText,
-  movePaddle
+  removeEvent
 } from "./initSetup";
 
+import { paddleNextPos } from "./paddle";
+
 export class Level {
-  reqId: number = -1;
-  levelStatus = false;
   paddleX = initPaddleX;
   ballPos: Position = initBallPos;
   ballDir: Position = initBallDir;
-  bricks: Brick[];
-  totalBricks: number;
-  hardBricks: number;
-  softBricks: number;
-  lives: number;
+
+  // Animation Frame ID
+  reqId: number = -1;
+  levelStatus = false;
+  levelLost = false;
   speedIncreased = false;
-  currLevel: number;
-  constructor(
-    k: {
-      bricks: Brick[];
-      totalBricks: number;
-      softBricks: number;
-      hardBricks: number;
-    },
-    lives: number,
-    currLevel: number
-  ) {
-    clearCanvas();
-    this.bricks = k.bricks;
-    this.totalBricks = k.totalBricks;
-    this.hardBricks = k.hardBricks;
-    this.softBricks = k.softBricks;
-    this.lives = lives;
-    this.currLevel = currLevel;
-    this.init();
+
+  // Data From Game...
+  k: LevelInfo;
+  p: PlayerInfo;
+
+  constructor(k: LevelInfo, p: PlayerInfo) {
+    this.k = k;
+    this.p = p;
+    this.addPaddleControls();
   }
 
-  init = () => {
+  // Add Event Listener for Keyboard and Mouse...
+  addPaddleControls = () => {
     const offSet = (window.innerWidth - canvasWidth) / 2;
-    document.addEventListener("keydown", (event: KeyboardEvent) => {
-      if (this.levelStatus) this.paddleX = movePaddle(this.paddleX, event.key);
-    });
+    document.addEventListener(
+      "keydown",
+      (evt: KeyboardEvent) => {
+        if (this.levelStatus)
+          this.paddleX = paddleNextPos(this.paddleX, evt.key);
+      },
+      false
+    );
     document.addEventListener(
       "mousemove",
-      (e: MouseEvent) => {
-        const relativeX = e.clientX - offSet;
-        if (relativeX > 0 && relativeX < canvasWidth && this.levelStatus) {
+      (evt: MouseEvent) => {
+        const relativeX = evt.clientX - offSet;
+        const inCanvas = relativeX > 0 && relativeX < canvasWidth;
+        if (inCanvas && this.levelStatus) {
           this.paddleX = relativeX - paddleWidth / 2;
-          drawPaddle(this.paddleX);
         }
       },
       false
     );
-    drawPaddle(this.paddleX);
-    handleBricks(this.bricks);
-    handleBall(this.ballPos, this.ballDir, this.paddleX, this.bricks);
+  };
+
+  reset = () => {
+    this.paddleX = initPaddleX;
+    this.ballPos = initBallPos;
+    this.ballDir = initBallDir;
   };
 
   runLevel = () => {
     clearCanvas();
     drawPaddle(this.paddleX);
-    handleBricks(this.bricks);
-    let b = handleBall(this.ballPos, this.ballDir, this.paddleX, this.bricks);
-    if (b.isCrash) {
-      this.lives--;
+    handleBricks(this.k.bricksData);
+    let { idx, newPos, newDir, isCrash } = handleBall(
+      this.ballPos,
+      this.ballDir,
+      this.paddleX,
+      this.k.bricksData
+    );
+    if (isCrash) {
+      this.p.lives--;
       this.crashed();
       return;
     }
-    this.ballPos = b.newPos;
-    this.ballDir = b.newDir;
+    this.ballPos = newPos;
+    this.ballDir = newDir;
     // Increase speed when 20% left, once..
-    if (!this.speedIncreased) {
-      this.ballDir = this.increaseSpeed();
-    }
-    if (b.idx !== null) this.bricks.splice(b.idx, 1);
+    if (!this.speedIncreased) this.ballDir = this.increaseSpeed();
 
-    if (this.bricks.length === this.hardBricks) {
+    if (idx !== null) {
+      this.k.bricksData.splice(idx, 1);
+      this.p.levelPoints += 10;
+      this.k.softBricks--;
+      this.k.totalBricks--;
+    }
+
+    if (this.k.bricksData.length === this.k.hardBricks) {
+      this.levelLost = false;
       this.stopLevel();
+      return;
     }
     this.reqId = window.requestAnimationFrame(this.runLevel);
   };
@@ -102,42 +110,34 @@ export class Level {
 
   increaseSpeed = () => {
     const shouldIncrSpeed =
-      (this.bricks.length - this.hardBricks) / this.softBricks <= 0.2;
+      (this.k.bricksData.length - this.k.hardBricks) / this.k.softBricks <= 0.2;
     if (!shouldIncrSpeed) return this.ballDir;
     else {
       this.speedIncreased = true;
-      // console.log("SPEED INCREASED")
       return <Position>this.ballDir.map(d => d * 1.25);
     }
   };
 
   crashed = () => {
-    if (this.lives > 0) {
-      window.cancelAnimationFrame(this.reqId);
-      clearCanvas();
-      showGameOverText(`Crashed ${this.lives} lives left`);
-      this.paddleX = initPaddleX;
-      this.ballPos = initBallPos;
-      this.ballDir = initBallDir;
-      setTimeout(() => {
-        this.runLevel();
-      }, 700);
-    } else {
-      this.stopLevel();
-    }
+    if (this.p.lives > 0) this.levelLost = false;
+    else this.levelLost = true;
+    this.stopLevel();
   };
 
   stopLevel = () => {
     this.levelStatus = false;
-    window.cancelAnimationFrame(this.reqId);
     clearCanvas();
+    window.cancelAnimationFrame(this.reqId);
+    removeEvent("mousemove");
+    removeEvent("keydown");
   };
 
   status = () => {
     return {
-      lives: this.lives,
-      status: this.levelStatus,
-      bricksLeft: this.bricks.length - this.hardBricks
+      k: this.k,
+      p: this.p,
+      running: this.levelStatus,
+      lost: this.levelLost
     };
   };
 }

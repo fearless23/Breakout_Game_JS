@@ -1,4 +1,4 @@
-import { canvasHeight, canvasWidth, maxLives, maxLevels } from "./constants";
+import { canvasHeight, canvasWidth, maxLevels } from "./constants";
 
 // Set HTML Game Section
 const gameSection = <HTMLElement>document.getElementById("game");
@@ -18,7 +18,7 @@ import { clear, gameOverText } from "./helpers";
 // CTX Based Draw Functions
 export const clearCanvas = clear(ctx);
 export const showGameOverText = gameOverText(ctx);
-export const { drawPaddle, movePaddle } = Paddle(ctx);
+export const { drawPaddle } = Paddle(ctx);
 export const handleBall = Ball(ctx);
 export const handleBricks = Bricks(ctx);
 
@@ -35,13 +35,13 @@ const levelSpan = <HTMLSpanElement>document.getElementById("level");
 const overlayDiv = <HTMLDivElement>document.getElementById("overlay");
 
 export const setPointsAndBricks = (
-  points: number,
-  bricksLeft: number,
-  totalBricks: number
+  levelPoints: number,
+  totalPoints: number,
+  bricksLeft: number
 ) => {
-  bricksSpan.innerText = String(bricksLeft) + "/" + String(totalBricks);
-  levelPointsSpan.innerText = String((totalBricks - bricksLeft) * 10);
-  totalPointsSpan.innerText = String(points + (totalBricks - bricksLeft) * 10);
+  bricksSpan.innerText = String(bricksLeft);
+  levelPointsSpan.innerText = String(levelPoints);
+  totalPointsSpan.innerText = String(totalPoints + levelPoints);
 };
 
 export const setStartBtn = (txt: string, disabled: boolean) => {
@@ -55,8 +55,9 @@ export const setStartBtn = (txt: string, disabled: boolean) => {
 };
 
 export const setLives = (lives: number) => {
-  livesSpan.innerText = String(lives) + "/" + String(maxLives);
+  livesSpan.innerText = String(lives);
 };
+
 export const setLevel = (level: number) => {
   levelSpan.innerText = String(level) + "/" + String(maxLevels);
 };
@@ -64,31 +65,12 @@ export const setLevel = (level: number) => {
 export const removeOverlay = () => {
   overlayDiv.classList.add("hide");
 };
-export const showOverLay = (
-  currLevel: number,
-  levelWon: boolean,
-  wasLastLevel: boolean
-) => {
+
+export const removeEvent = (evtType: string) => {
+  document.removeEventListener(evtType, _ => {});
+};
+
+export const showOverLay = (str: string) => {
   overlayDiv.classList.remove("hide");
-  if (levelWon && wasLastLevel) {
-    overlayDiv.innerHTML = `
-    <h3>You won level ${currLevel} and the game</h3>
-    <p>Restart the game</p>
-    `;
-    return;
-  }
-  if (!levelWon && wasLastLevel) {
-    overlayDiv.innerHTML = `
-    <h3>You lost level ${currLevel} and the game</h3>
-    <p>Restart the game</p>
-    `;
-    return;
-  }
-  if (levelWon && !wasLastLevel) {
-    overlayDiv.innerHTML = `
-    <h3>You won level ${currLevel}</h3>
-    <p>Continue to Level ${currLevel + 1}</p>
-    `;
-    return;
-  }
+  overlayDiv.innerHTML = `<h3>${str}</h3>`;
 };

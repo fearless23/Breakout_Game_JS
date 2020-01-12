@@ -11,84 +11,141 @@ import {
 import { makeBricks } from "./createBricks";
 
 import { maxLives, maxLevels } from "./constants";
+import { LevelInfo, PlayerInfo } from "./types";
 
 export class Game {
-  level: number = 1;
-  points: number = 0;
-  livesLeft: number;
-  maxLevel: number;
-  intervalId: number;
+  gameOver = false;
+  k: LevelInfo = {
+    bricksData: [],
+    totalBricks: 0,
+    softBricks: 0,
+    hardBricks: 0
+  };
+  totalPoints: number = 0;
+  p: PlayerInfo = {
+    currLevel: 1,
+    levelPoints: 0,
+    lives: maxLives
+  };
+  maxLevel: number = maxLevels;
+  intervalId: number = -1;
   constructor() {
-    this.maxLevel = maxLevels;
-    this.livesLeft = maxLives;
-    this.intervalId = -1;
     this.initBtnCtrl();
+    this.restart();
   }
 
   initBtnCtrl() {
-    startBtn.addEventListener("mousedown", _ => this.handleLevel(this.level));
+    startBtn.addEventListener("mousedown", _ =>
+      this.handleLevel(this.p.currLevel)
+    );
   }
 
-  reset = () => {
-    this.level = 1;
-    this.points = 0;
-    this.livesLeft = maxLives;
-    clearInterval(this.intervalId);
-    // console.log("CLEAR", this.intervalId);
+  restart = () => {
+    // Case 1: level lost = lives completed
+    // Case 2: game won
+    this.gameOver = true;
+    this.totalPoints = 0;
+    this.k = {
+      bricksData: [],
+      totalBricks: 0,
+      softBricks: 0,
+      hardBricks: 0
+    };
+    this.p = {
+      currLevel: 1,
+      levelPoints: 0,
+      lives: maxLives
+    };
+
+    startBtn.removeEventListener("mousedown", () => {});
   };
 
-  btnCtrl = (levelStatus: any, softBricks: number) => {
-    const { status, bricksLeft, lives } = levelStatus;
+  crashReset = (k: LevelInfo, p: PlayerInfo) => {
+    this.k = k;
+    this.p = p;
+  };
+
+  nextLevelSet = (levelPoints: number) => {
+    this.k = {
+      bricksData: [],
+      totalBricks: 0,
+      softBricks: 0,
+      hardBricks: 0
+    };
+    this.totalPoints += levelPoints;
+    this.p.currLevel++;
+    this.p.levelPoints = 0;
+  };
+
+  clear = () => {
+    clearInterval(this.intervalId);
+    return;
+  };
+
+  btnCtrl = (levelData: {
+    k: LevelInfo;
+    p: PlayerInfo;
+    running: boolean;
+    lost: boolean;
+  }) => {
+    const { k, p, running: levelStatus, lost: levelLost } = levelData;
     // Level is Running
-    if (status) {
-      setPointsAndBricks(this.points, bricksLeft, softBricks);
-      setLives(lives);
+    if (levelStatus) {
+      setPointsAndBricks(p.levelPoints, this.totalPoints, k.softBricks);
+      setLives(p.lives);
       return;
+    }
+    console.log(levelData);
+    setPointsAndBricks(p.levelPoints, this.totalPoints, k.softBricks);
+    setLives(p.lives);
+
+    // Level Lost
+    if (levelLost) {
+      setStartBtn("Lost - Restart", false);
+      showOverLay("Lost Level, Restart");
+      this.restart();
+      return this.clear();
     }
 
-    // 1. Level Lost
-    if (bricksLeft !== 0) {
-      setStartBtn("Lost - Restart", false);
-      setPointsAndBricks(this.points, bricksLeft, softBricks);
-      showOverLay(this.level, false, this.level === this.maxLevel);
-      this.reset();
-      return;
+    // CRASHED
+    if (k.softBricks !== 0) {
+      setStartBtn("Crashed, Continue", false);
+      showOverLay("Oops crashed");
+      this.crashReset(k, p);
+      return this.clear();
     }
-    // 2. Level Won but it was last Level
-    if (this.level >= this.maxLevel) {
+
+    // LEVEL WON; CONTINUE TO NEXT LEVEL
+    if (p.currLevel !== this.maxLevel) {
+      setStartBtn("Next Level", false);
+      showOverLay("Continue to next level");
+      this.nextLevelSet(p.levelPoints);
+      return this.clear();
+    }
+
+    // WON THE GAME
+    if (p.currLevel === this.maxLevel) {
       setStartBtn("Game Won, Restart", false);
-      setPointsAndBricks(this.points, bricksLeft, softBricks);
-      showOverLay(this.level, true, true);
-      this.reset();
-      return;
+      showOverLay("Game Won, Restart");
+      this.restart();
+      return this.clear();
     }
-    // status = false, bricksLeft===0, level < maxLevel
-    // 3. Level Won - Continue to next Level with button press
-    setStartBtn("Start Next Level", false);
-    setPointsAndBricks(this.points, bricksLeft, softBricks);
-    showOverLay(this.level, true, false);
-    setLives(lives);
-    this.points += softBricks * 10;
-    this.level++;
-    clearInterval(this.intervalId);
-    // console.log("CLEAR", this.intervalId);
   };
 
   handleLevel = (level: number) => {
-    const k = makeBricks(level, level * 6);
-    // Remove overlay...
+    let k: LevelInfo = this.k;
+    if (this.k.softBricks === 0) {
+      k = makeBricks(level, level * 6);
+    }
     removeOverlay();
-    const currLevel = new Level(k, this.livesLeft, level);
+    const currLevel = new Level(k, this.p);
     currLevel.start();
 
-    setStartBtn("Running", true);
-    setPointsAndBricks(this.points, k.softBricks, k.softBricks);
+    setStartBtn(`Running Level ${level}`, true);
+    setPointsAndBricks(this.p.levelPoints, this.totalPoints, k.softBricks);
     setLevel(level);
-    setLives(this.livesLeft);
+    setLives(this.p.lives);
 
-    this.intervalId = setInterval(
-      () => this.btnCtrl(currLevel.status(), k.softBricks),
-      500
-    );
+    this.intervalId = setInterval(() => this.btnCtrl(currLevel.status()), 500);
   };
 }

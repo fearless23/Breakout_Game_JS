@@ -27,23 +27,30 @@ const drawPaddle = (ctx: CanvasRenderingContext2D) => (paddleX: number) => {
   ctx.closePath();
 };
 
-const movePaddle = (ctx: CanvasRenderingContext2D) => (
-  paddleX: number,
-  move: string
-) => {
+// const movePaddle = (ctx: CanvasRenderingContext2D) => (
+//   paddleX: number,
+//   move: string
+// ) => {
+//   const m = getMoveNum(move);
+//   if (m === 0) {
+//     drawPaddle(ctx)(paddleX);
+//     return paddleX;
+//   }
+//   const newPos = getNextPos(paddleX, m);
+//   drawPaddle(ctx)(newPos);
+//   return newPos;
+// };
+
+export const paddleNextPos = (paddleX: number, move: string) => {
   const m = getMoveNum(move);
   if (m === 0) {
-    drawPaddle(ctx)(paddleX);
     return paddleX;
   }
-  const newPos = getNextPos(paddleX, m);
-  drawPaddle(ctx)(newPos);
-  return newPos;
+  return getNextPos(paddleX, m);
 };
 
 export const Paddle = function(ctx: CanvasRenderingContext2D) {
   return {
-    drawPaddle: drawPaddle(ctx),
-    movePaddle: movePaddle(ctx)
+    drawPaddle: drawPaddle(ctx)
   };
 };

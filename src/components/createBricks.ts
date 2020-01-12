@@ -53,26 +53,26 @@ export const makeBricks = (
   rowsToCreate: number,
   hardBricksProb: number = 0
 ) => {
-  const bricks: Brick[] = [];
+  const bricksData: Brick[] = [];
   const maxRows = getMaxRows();
   const maxBricksInRow = getMaxBricksInRow();
   const rowsGen = Math.min(rowsToCreate, maxRows);
-  let bricksCreated = rowsGen * maxBricksInRow;
-  let hardBricksCreated = 0;
+  let totalBricks = rowsGen * maxBricksInRow;
+  let hardBricks = 0;
 
   for (let i = 0; i < rowsGen; i++) {
     for (let j = 0; j < maxBricksInRow; j++) {
       const hard = hardBricksProb === 0 ? false : isHard(hardBricksProb);
-      if (hard) hardBricksCreated++;
+      if (hard) hardBricks++;
       const brick = makeBrick(getRowX(j), getRowY(i), hard);
-      bricks.push(brick);
+      bricksData.push(brick);
     }
   }
 
   return {
-    bricks,
-    totalBricks: bricksCreated,
-    hardBricks: hardBricksCreated,
-    softBricks: bricksCreated - hardBricksCreated
+    bricksData,
+    totalBricks,
+    hardBricks,
+    softBricks: totalBricks - hardBricks
   };
 };

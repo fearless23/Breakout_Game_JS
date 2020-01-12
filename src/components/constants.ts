@@ -1,7 +1,7 @@
 import { Position } from "./types";
 
-export const canvasWidth = 600;
-export const canvasHeight = canvasWidth*5/8;
+export const canvasWidth = Math.min(960, window.innerWidth - 30);
+export const canvasHeight = (canvasWidth * 5) / 8;
 
 // Paddle Features
 export const paddleWidth = canvasWidth / 5;
