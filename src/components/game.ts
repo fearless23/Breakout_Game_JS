@@ -34,7 +34,7 @@ export class Game {
     this.points = 0;
     this.livesLeft = maxLives;
     clearInterval(this.intervalId);
-    console.log("CLEAR", this.intervalId);
+    // console.log("CLEAR", this.intervalId);
   };
 
   btnCtrl = (levelStatus: any, softBricks: number) => {
@@ -71,7 +71,7 @@ export class Game {
     this.points += softBricks * 10;
     this.level++;
     clearInterval(this.intervalId);
-    console.log("CLEAR", this.intervalId);
+    // console.log("CLEAR", this.intervalId);
   };
 
   handleLevel = (level: number) => {

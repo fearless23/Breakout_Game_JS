@@ -7,8 +7,8 @@ import {
 } from "./constants";
 
 const getMoveNum = (move: string): 1 | -1 | 0 => {
-  if (move === "ArrowRight") return 1;
-  if (move === "ArrowLeft") return -1;
+  if (move === "ArrowRight" || move === "Right") return 1;
+  if (move === "ArrowLeft" || move === "Left") return -1;
   return 0;
 };
 
@@ -20,8 +20,11 @@ const getNextPos = function(paddleX: number, m: number): number {
 };
 
 const drawPaddle = (ctx: CanvasRenderingContext2D) => (paddleX: number) => {
-  ctx.fillStyle = "#2eb364";
-  ctx.fillRect(paddleX, paddleY, paddleWidth, paddleHeight);
+  ctx.beginPath();
+  ctx.rect(paddleX, paddleY, paddleWidth, paddleHeight);
+  ctx.fillStyle = "#0095DD";
+  ctx.fill();
+  ctx.closePath();
 };
 
 const movePaddle = (ctx: CanvasRenderingContext2D) => (

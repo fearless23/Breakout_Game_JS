@@ -141,7 +141,7 @@ const getBallPos = function(
       newPos: <Position>[k.br, cy]
     };
 
-  console.log("WHAT!!!!", corner);
+  // console.log("WHAT!!!!", corner);
   return { ...r, idx: null };
 };
 
@@ -150,6 +150,7 @@ const fillBall = (ctx: CanvasRenderingContext2D, [x, y]: Position) => {
   ctx.fillStyle = "purple";
   ctx.arc(x + ballRadius, y + ballRadius, ballRadius, 0, 2 * Math.PI);
   ctx.fill();
+  ctx.closePath();
 };
 
 export const Ball = (ctx: CanvasRenderingContext2D) => (

@@ -1,5 +1,12 @@
 import { Position, Brick } from "./types";
-import { initPaddleX, initBallDir, initBallPos, ballSpeed } from "./constants";
+import {
+  initPaddleX,
+  initBallDir,
+  initBallPos,
+  ballSpeed,
+  paddleWidth,
+  canvasWidth
+} from "./constants";
 import {
   clearCanvas,
   drawPaddle,
@@ -39,17 +46,30 @@ export class Level {
     this.softBricks = k.softBricks;
     this.lives = lives;
     this.currLevel = currLevel;
-    this.paddle();
+    this.init();
   }
 
-  paddle = () => {
+  init = () => {
+    const offSet = (window.innerWidth - canvasWidth) / 2;
     document.addEventListener("keydown", (event: KeyboardEvent) => {
       if (this.levelStatus) this.paddleX = movePaddle(this.paddleX, event.key);
     });
+    document.addEventListener(
+      "mousemove",
+      (e: MouseEvent) => {
+        const relativeX = e.clientX - offSet;
+        if (relativeX > 0 && relativeX < canvasWidth && this.levelStatus) {
+          this.paddleX = relativeX - paddleWidth / 2;
+          drawPaddle(this.paddleX);
+        }
+      },
+      false
+    );
     drawPaddle(this.paddleX);
     handleBricks(this.bricks);
     handleBall(this.ballPos, this.ballDir, this.paddleX, this.bricks);
   };
+
   runLevel = () => {
     clearCanvas();
     drawPaddle(this.paddleX);
@@ -71,12 +91,13 @@ export class Level {
     if (this.bricks.length === this.hardBricks) {
       this.stopLevel();
     }
-    window.requestAnimationFrame(this.runLevel);
+    this.reqId = window.requestAnimationFrame(this.runLevel);
   };
 
   start = () => {
     this.levelStatus = true;
-    this.reqId = window.requestAnimationFrame(this.runLevel);
+    this.runLevel();
+    // this.reqId = window.requestAnimationFrame(this.runLevel);
   };
 
   increaseSpeed = () => {
@@ -85,7 +106,7 @@ export class Level {
     if (!shouldIncrSpeed) return this.ballDir;
     else {
       this.speedIncreased = true;
-      console.log("SPEED INCREASED")
+      // console.log("SPEED INCREASED")
       return <Position>this.ballDir.map(d => d * 1.25);
     }
   };
